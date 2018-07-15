@@ -243,8 +243,8 @@ export default class HLS extends HTML5VideoPlayback {
       Log.warn('Attempt to seek to a negative time. Resetting to live point. Use seekToLivePoint() to seek to the live point.')
       time = this.getDuration()
     }
-    // assume live if time within 3 seconds of end of stream
-    this.dvrEnabled && this._updateDvr(time < this.getDuration()-3)
+    // TODO: use Math.round on duration?
+    this.dvrEnabled && this._updateDvr(time < this.getDuration() - this.fragmentDuration)
     time += this._startTime
     super.seek(time)
   }
@@ -557,7 +557,9 @@ export default class HLS extends HTML5VideoPlayback {
     startTimeChanged && this._onProgress()
   }
 
-  _onFragmentLoaded(evt, data) {
+  _onFragmentLoaded(evt, data = {}) {
+    // assume live if time within 3 seconds of end of stream
+    this.fragmentDuration = data.frag && data.frag.duration || 3
     this.trigger(Events.PLAYBACK_FRAGMENT_LOADED, data)
   }
 
