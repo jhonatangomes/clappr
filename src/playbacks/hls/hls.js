@@ -249,6 +249,16 @@ export default class HLS extends HTML5VideoPlayback {
     super.seek(time)
   }
 
+  _handleBufferingEvents() {
+    super._handleBufferingEvents()
+    // duration - current > frag
+    // - current > frag - duration
+    // current < duration - frag
+    // TODO: update dvr state here or listen to buffering event?
+    // TODO: use Math.round on current Time and duration?
+    this.dvrEnabled && this._updateDvr(this.getCurrentTime() < this.getDuration() - this.fragmentDuration)
+  }
+
   seekToLivePoint() {
     this.seek(this.getDuration())
   }
