@@ -194,6 +194,7 @@ export default class Container extends UIObject {
   playbackDvrStateChanged(dvrInUse) {
     this.settings = this.playback.settings
     this.dvrInUse = dvrInUse
+    console.log('playbackDvrStateChanged: ', dvrInUse)
     this.trigger(Events.CONTAINER_PLAYBACKDVRSTATECHANGED, dvrInUse)
   }
 

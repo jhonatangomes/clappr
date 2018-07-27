@@ -30,10 +30,12 @@ export default class SpinnerThreeBouncePlugin extends UIContainerPlugin {
   }
 
   onBuffering() {
+    console.log('onBuffering - show')
     this.show()
   }
 
   onBufferFull() {
+    console.log('onBufferFull - hide')
     this.hide()
   }
 
@@ -42,12 +44,14 @@ export default class SpinnerThreeBouncePlugin extends UIContainerPlugin {
   }
 
   show() {
+    console.log('show: ', this.showTimeout)
     if (this.showTimeout === null)
       this.showTimeout = setTimeout(() => this.$el.show(), 300)
 
   }
 
   hide() {
+    console.log('hide')
     if (this.showTimeout !== null) {
       clearTimeout(this.showTimeout)
       this.showTimeout = null

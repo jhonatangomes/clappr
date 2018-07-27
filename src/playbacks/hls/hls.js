@@ -100,6 +100,10 @@ export default class HLS extends HTML5VideoPlayback {
     return this._extrapolatedWindowNumSegments * this._segmentTargetDuration
   }
 
+  get isDvrInUse() {
+    return this.getCurrentTime() < this.getDuration()
+  }
+
   static get HLSJS() {
     return HLSJS
   }
@@ -243,20 +247,27 @@ export default class HLS extends HTML5VideoPlayback {
       Log.warn('Attempt to seek to a negative time. Resetting to live point. Use seekToLivePoint() to seek to the live point.')
       time = this.getDuration()
     }
-    // TODO: use Math.round on duration?
-    this.dvrEnabled && this._updateDvr(time < this.getDuration() - this.fragmentDuration)
+    const newDvrState = !this.isPlaying() || (time < this.getDuration() - this.fragmentDuration)
+    this.dvrEnabled && this._updateDvr(newDvrState)
     time += this._startTime
     super.seek(time)
   }
 
-  _handleBufferingEvents() {
-    super._handleBufferingEvents()
+  _onBuffering() {
+    super._onBuffering()
+    console.log('_onBuffering')
+    // const newDvrState = !this.isPlaying() || (this.getCurrentTime() < this.getDuration() - this.fragmentDuration)
+    // this.dvrEnabled && this._updateDvr(!this.isPlaying() || this.getCurrentTime() < this.getDuration())
+  }
+
+  _onBufferfull() {
+    super._onBufferfull()
+    console.log('_onBufferfull')
     // duration - current > frag
     // - current > frag - duration
     // current < duration - frag
-    // TODO: update dvr state here or listen to buffering event?
-    // TODO: use Math.round on current Time and duration?
-    this.dvrEnabled && this._updateDvr(this.getCurrentTime() < this.getDuration() - this.fragmentDuration)
+    const newDvrState = !this.isPlaying() || (this.getCurrentTime() < this.getDuration() - this.fragmentDuration)
+    this.dvrEnabled && this._updateDvr(newDvrState)
   }
 
   seekToLivePoint() {
@@ -393,19 +404,19 @@ export default class HLS extends HTML5VideoPlayback {
   play() {
     if (!this._hls)
       this._setup()
-
+    console.log('play')
     super.play()
     this._startTimeUpdateTimer()
+    this.dvrEnabled && this._updateDvr(this.isDvrInUse)
   }
 
   pause() {
     if (!this._hls)
       return
-
+    console.log('pause')
     super.pause()
     if (this.dvrEnabled)
       this._updateDvr(true)
-
   }
 
   stop() {

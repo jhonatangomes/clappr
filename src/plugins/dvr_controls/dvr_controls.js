@@ -59,7 +59,6 @@ export default class DVRControls extends UICorePlugin {
 
     if (mediaControl.$el.hasClass('dvr'))
       container.seek(container.getDuration())
-
   }
 
   settingsUpdate() {
